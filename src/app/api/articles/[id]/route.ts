@@ -18,6 +18,7 @@ export async function GET(
       excerpt: schema.articles.excerpt,
       content: schema.articles.content,
       coverImage: schema.articles.coverImage,
+      coverImageAttribution: schema.articles.coverImageAttribution,
       status: schema.articles.status,
       categoryId: schema.articles.categoryId,
       authorId: schema.articles.authorId,
@@ -69,6 +70,7 @@ export async function PATCH(
   if (body.excerpt !== undefined) updates.excerpt = body.excerpt;
   if (body.content !== undefined) updates.content = body.content;
   if (body.coverImage !== undefined) updates.coverImage = body.coverImage;
+  if (body.coverImageAttribution !== undefined) updates.coverImageAttribution = body.coverImageAttribution;
   if (body.categoryId !== undefined) updates.categoryId = body.categoryId;
   if (body.status !== undefined) {
     updates.status = body.status;

@@ -20,6 +20,7 @@ export default async function ArticlePage({
       excerpt: schema.articles.excerpt,
       content: schema.articles.content,
       coverImage: schema.articles.coverImage,
+      coverImageAttribution: schema.articles.coverImageAttribution,
       publishedAt: schema.articles.publishedAt,
       categoryName: schema.categories.name,
       categorySlug: schema.categories.slug,
@@ -38,6 +39,16 @@ export default async function ArticlePage({
 
   if (!article) {
     notFound();
+  }
+
+  // Parse attribution if present
+  let photoAttribution: { photographer: string; photographerUrl: string } | null = null;
+  if (article.coverImageAttribution) {
+    try {
+      photoAttribution = JSON.parse(article.coverImageAttribution);
+    } catch {
+      // ignore invalid attribution JSON
+    }
   }
 
   // Split content into paragraphs
@@ -85,12 +96,36 @@ export default async function ArticlePage({
         </div>
 
         {article.coverImage && (
-          <div className="mb-8 rounded-lg overflow-hidden">
-            <img
-              src={article.coverImage}
-              alt={article.title}
-              className="w-full"
-            />
+          <div className="mb-8">
+            <div className="rounded-lg overflow-hidden">
+              <img
+                src={article.coverImage}
+                alt={article.title}
+                className="w-full"
+              />
+            </div>
+            {photoAttribution && (
+              <p className="text-xs text-gray-400 mt-2">
+                Photo by{" "}
+                <a
+                  href={`${photoAttribution.photographerUrl}?utm_source=ainews&utm_medium=referral`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline hover:text-gray-600"
+                >
+                  {photoAttribution.photographer}
+                </a>{" "}
+                on{" "}
+                <a
+                  href="https://unsplash.com/?utm_source=ainews&utm_medium=referral"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline hover:text-gray-600"
+                >
+                  Unsplash
+                </a>
+              </p>
+            )}
           </div>
         )}
 

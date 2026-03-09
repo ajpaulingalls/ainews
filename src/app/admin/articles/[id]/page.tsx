@@ -31,6 +31,7 @@ export default async function EditArticlePage({
           excerpt: article.excerpt || "",
           content: article.content,
           coverImage: article.coverImage || "",
+          coverImageAttribution: article.coverImageAttribution || "",
           categoryId: article.categoryId,
           status: article.status,
         }}

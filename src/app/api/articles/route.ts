@@ -23,6 +23,7 @@ export async function GET(request: NextRequest) {
       slug: schema.articles.slug,
       excerpt: schema.articles.excerpt,
       coverImage: schema.articles.coverImage,
+      coverImageAttribution: schema.articles.coverImageAttribution,
       status: schema.articles.status,
       categoryId: schema.articles.categoryId,
       authorId: schema.articles.authorId,
@@ -62,7 +63,7 @@ export async function POST(request: NextRequest) {
   }
 
   const body = await request.json();
-  const { title, excerpt, content, coverImage, categoryId, status } = body;
+  const { title, excerpt, content, coverImage, coverImageAttribution, categoryId, status } = body;
 
   if (!title || !content) {
     return NextResponse.json({ error: "Title and content are required" }, { status: 400 });
@@ -79,6 +80,7 @@ export async function POST(request: NextRequest) {
       excerpt: excerpt || null,
       content,
       coverImage: coverImage || null,
+      coverImageAttribution: coverImageAttribution || null,
       status: status || "draft",
       categoryId: categoryId || null,
       authorId: user.id,

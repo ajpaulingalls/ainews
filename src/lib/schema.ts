@@ -30,6 +30,7 @@ export const articles = sqliteTable("articles", {
   excerpt: text("excerpt"),
   content: text("content").notNull(),
   coverImage: text("cover_image"),
+  coverImageAttribution: text("cover_image_attribution"),
   status: text("status", { enum: ["draft", "published", "archived"] })
     .notNull()
     .default("draft"),
