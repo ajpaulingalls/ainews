@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 
 interface Category {
@@ -34,7 +34,9 @@ export default function ArticleEditor({
     article?.categoryId || null
   );
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     fetch("/api/categories")
@@ -42,6 +44,26 @@ export default function ArticleEditor({
       .then(setCategories)
       .catch(() => {});
   }, []);
+
+  async function handleUpload(file: File) {
+    setUploading(true);
+    setError("");
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/api/upload", { method: "POST", body: formData });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error || "Upload failed");
+        return;
+      }
+      setCoverImage(data.url);
+    } catch {
+      setError("Upload failed");
+    } finally {
+      setUploading(false);
+    }
+  }
 
   async function handleSave(status: string) {
     if (!title.trim() || !content.trim()) {
@@ -129,15 +151,52 @@ export default function ArticleEditor({
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Cover Image URL
+              Cover Image
             </label>
             <input
-              type="url"
-              value={coverImage}
-              onChange={(e) => setCoverImage(e.target.value)}
-              placeholder="https://..."
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900"
+              ref={fileInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/gif,image/webp"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) handleUpload(file);
+              }}
+              className="hidden"
             />
+            {coverImage ? (
+              <div className="relative">
+                <img
+                  src={coverImage}
+                  alt="Cover preview"
+                  className="w-full h-32 object-cover rounded-md border border-gray-300"
+                />
+                <div className="absolute top-1 right-1 flex gap-1">
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="px-2 py-1 bg-white/90 text-gray-700 rounded text-xs hover:bg-white"
+                  >
+                    Replace
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setCoverImage("")}
+                    className="px-2 py-1 bg-white/90 text-red-600 rounded text-xs hover:bg-white"
+                  >
+                    Remove
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploading}
+                className="w-full h-32 border-2 border-dashed border-gray-300 rounded-md flex items-center justify-center text-sm text-gray-500 hover:border-gray-400 hover:text-gray-600"
+              >
+                {uploading ? "Uploading..." : "Click to upload image"}
+              </button>
+            )}
           </div>
         </div>
 
